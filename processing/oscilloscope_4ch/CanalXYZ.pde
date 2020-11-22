@@ -18,19 +18,20 @@ class CanalXYZ{
   CanalXYZ(color nCor_,int x_, int y_, int w_, int h_){
      x=x_; y=y_; w=w_; h=h_;
      nCor=nCor_;
-     XYZ=new Botao("XYZ",x,y,w/2,15,nCor,nCor);
+     XYZ=new Botao("XY plot(one chan>x other chan>y)",x,y,w,15,nCor,nCor);
      //inv=new CheckBox("INV",x+w/2+8,y+4,12);
      for (int k=0; k<3;k++){
-        selXYZ[k]=new Botao(str(k),x+w/2+5+k*(18+2),y+1,18,15);
+        selXYZ[k]=new Botao(str(k),x+w/2+w/8+k*(18+2),y+h/2,18,15);
         selXYZ[k].cor_ativo=cor[parseInt(selXYZ[k].tex)];
         selXYZ[k].clicado=true;
       }
 
      XYZ.clicado=false;
-     fm=new Dial(escLog,altMove,!nInt,fmt,"","v/div",2f,100e-3f,20f,x+10,selXYZ[0].y+selXYZ[0].h+5,w-20,20);
+     fm=new Dial(escLog,altMove,!nInt,fmt,"","v/div",2f,100e-3f,20f,x+10,selXYZ[0].y-selXYZ[0].h*3/2,w-20,20);
+//     fm=new Dial(escLog,altMove,!nInt,fmt,"","v/div",2f,100e-3f,20f,x+10,selXYZ[0].y+selXYZ[0].h-37,w-20,20);
      p0=tela.y+12*Q;//posição da tensão zero
-     curvaSuave=new CheckBox("curva suave",fm.x,fm.y+fm.h+5,15);
-     verCanais=new CheckBox("ver canais",curvaSuave.x,curvaSuave.y+curvaSuave.h+2,15);
+     curvaSuave=new CheckBox("Smooth curve",fm.x,fm.y+fm.h+5,15);
+     verCanais=new CheckBox("Display source channels",curvaSuave.x,curvaSuave.y+curvaSuave.h+2,15);
     
   }
   

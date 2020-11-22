@@ -99,7 +99,7 @@ int ch[]={0,1,2,3}; // quais canais estão visiveis (ON)
 int marg1, marg2; //margem temporaria para ajustar a posição dos objetos
 
 void setup() {
-  size(660, 700); 
+  size(750, 700); 
   //size(800,700);
   frameRate(10);
   
@@ -131,31 +131,32 @@ void setup() {
       grupo[k]=new Grupo(); 
    }
 
-  resetEixos=new Botao("eixos",marg1+50,tela.y,45,20);
-  resetMedir=new Botao("medir",resetEixos.x+resetEixos.w+2,tela.y,45,20);
+  resetEixos=new Botao("Reset axis",marg1,tela.y-15,100,20);
+  resetMedir=new Botao("Clear measurements",resetEixos.x+resetEixos.w+2,tela.y-15,160,20);
 
   //demo & canais
   for (byte k=0; k<4; k++) {
     if (k<3) {demo[k]=new Botao(str(k+1), marg1+50+k*30, tela.y/2-10, 30, 20);}
     //medir[k]=new Botao(str(k),marg2+60+k*(18+2),tela.y+10,18,20,cor[k],cor[k]);
     //trigger[k]=new Botao(str(k),medir[k].x,medir[k].y+medir[k].h+10,medir[k].w,20,cor[k],cor[k]);
-    canal[k]=new Canal(k, cor[k], marg1, tela.y+27+k*110, 143, 100); //h115
+    canal[k]=new Canal(k, cor[k], marg1, tela.y+15+k*115, 240, 110); //h115
   }
   //medir[4]=new Botao("x",medir[3].x+medir[3].w,medir[3].y,medir[3].w,medir[3].h,color(200),color(0));
   //trigger[4]=new Botao("x",trigger[3].x+trigger[3].w,trigger[3].y,trigger[3].w,trigger[3].h,color(200),color(0));
 
   
   //chXYZ
-  chXYZ=new CanalXYZ(color(255,0,255),marg1,canal[3].y+canal[3].h+10,143,80);
+  chXYZ=new CanalXYZ(color(255,0,255),marg1,canal[3].y+canal[3].h+5,240,80);
   chXYZ.verCanais.clicado=true;
   
-  verPontos=new CheckBox("ver pontos", chXYZ.x, chXYZ.y+chXYZ.h+5, 15);
-  calcFreq=new CheckBox("detectar freq.", verPontos.x, verPontos.y+verPontos.h+5, 15);
-  grafDif=new CheckBox("ver",calcFreq.x+calcFreq.w,calcFreq.y,15);
+  verPontos=new CheckBox("Display acquired points", chXYZ.x, chXYZ.y+chXYZ.h+2, 15);
+  calcFreq=new CheckBox("Measure frequency", verPontos.x, verPontos.y+verPontos.h+2, 15);
+  grafDif=new CheckBox("Display derivative",calcFreq.x,calcFreq.y+calcFreq.h+2,15);
+//  grafDif=new CheckBox("Display derivative",calcFreq.x+calcFreq.w,calcFreq.y,15);
   //ruido=new Dial(escLinear, altMove, !nInt, fmt, "ruido", "V", 0, 0, 2, calcFreq.x+20, calcFreq.y+17, 100, 20);
 
   // 08-jun-2017 - button to save data  in data.txt
-  save=new Botao("salvar datax.txt",calcFreq.x,calcFreq.y+calcFreq.h+5,150,20);
+  save=new Botao("Save data in datax.txt",calcFreq.x,grafDif.y+grafDif.h+2,200,20);
 
 
   //medidor de resistor/capacitor
@@ -200,7 +201,7 @@ void draw() {
   fill(0); 
   textAlign(RIGHT, CENTER); 
   text("DEMO", demo[0].x-5, demo[0].y+demo[0].h/2); //tela.x+tela.w+10,tela.y);
-  text("RESET",resetEixos.x-5,resetEixos.y+resetEixos.h/2);
+//  text("RESET",resetEixos.x-5,resetEixos.y+resetEixos.h/2);
   //text("medir", medir[0].x-5,medir[0].y+medir[0].h/2);
   //text("trigger", trigger[0].x-5,trigger[0].y+trigger[0].h/2);
   chXYZ.display();
@@ -608,7 +609,7 @@ void mouseClicked() {
             outputOpen=false;
             qSave=1;
             if (qSave>10) {qSave=1;}
-            save.tex="salvar datax.txt" + "-"+qSave;
+            save.tex="Save data in datax.txt" + "-"+qSave;
             save.clicado=false;
           }
         } else {
@@ -638,7 +639,7 @@ void mouseClicked() {
           output.close();
           qSave+=1;
           if (qSave>10) {qSave=1;}
-          save.tex="salvar datax.txt" + "-"+qSave;
+          save.tex="Save data in datax.txt" + "-"+qSave;
           save.clicado=false;
         }
   }
@@ -930,7 +931,7 @@ void fecharDados(){
       output.close();  
       outputOpen=false;
       if (qSave>10) {qSave=1;}
-      save.tex="salvar datax.txt" + "-"+qSave;
+      save.tex="Save data in datax.txt" + "-"+qSave;
       save.clicado=false;
 }
 
@@ -1051,7 +1052,7 @@ void serialEvent(Serial p) {
             }
             output.println();
             if (qSave % 100==0) { // de 100 em 100
-              save.tex="salvando "+nf(qSave);
+              save.tex="Saved "+nf(qSave);
               output.flush();
             }
           //}
