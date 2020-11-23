@@ -95,9 +95,11 @@ class Canal{
         
        //== mostrar a linha P0 de tensão zero
        strokeWeight(1); stroke(nCor,150);
-       line(tela.x-10*n,p0,tela.x+tela.w,p0);
+       line(tela.x-10,p0,tela.x+tela.w,p0);
+//       line(tela.x-10*n,p0,tela.x+tela.w,p0);
        fill(nCor); noStroke();
-       triangle(tela.x-10*n,p0,tela.x-10-10*n,p0-10,tela.x-10-10*n,p0+10);
+       triangle(tela.x,p0,tela.x-10,p0-10,tela.x-10,p0+10);
+//       triangle(tela.x-10*n,p0,tela.x-10-10*n,p0-10,tela.x-10-10*n,p0+10);
       
       //== mostrar a linha do trigger se o trigger estiver acionado
       if (trigger.clicado){

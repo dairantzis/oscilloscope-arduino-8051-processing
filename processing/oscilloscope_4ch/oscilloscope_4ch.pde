@@ -1,5 +1,5 @@
 // rogerio.bego@hotmail.com
-String versao="v1.3";
+String versao="v1.4";
 // 24/06/2017 => when start serial communication, processing send initial commands to arduino in eventserial
 // 24/06/2017 => dynamic buffer bug fixed - qInit was not returning to 0 when q changed
 // 22/05/2017 => v1.3 dynamic buffer - 1ch=400pt/ch, 2chs=200pt/ch, 3chs=130pt/ch, 4chs=100pt/ch
@@ -131,7 +131,7 @@ void setup() {
       grupo[k]=new Grupo(); 
    }
 
-  resetEixos=new Botao("Reset axis",marg1,tela.y-15,100,20);
+  resetEixos=new Botao("Reset 0V point",marg1,tela.y-15,100,20);
   resetMedir=new Botao("Clear measurements",resetEixos.x+resetEixos.w+2,tela.y-15,160,20);
 
   //demo & canais
@@ -160,26 +160,32 @@ void setup() {
 
 
   //medidor de resistor/capacitor
-  pnlRC=new Painel("", tela.x, tela.y+tela.h+10, 125, 40);
+  pnlRC=new Painel("", tela.x, tela.y+tela.h+10, 1, 40);
+//  pnlRC=new Painel("", tela.x, tela.y+tela.h+10, 125, 40);
   RC=new CheckBox("medir res./cap.", pnlRC.x, pnlRC.y, 15);
 
   //Gerador de Sinais - agora só gera onda quadrada, depois vai gerar triangulo, denteDeSerra, e senidal
-  pnlSinal=new Painel("", pnlRC.x+pnlRC.w+10, pnlRC.y, 100, 85);
-  sinal=new CheckBox("Ger.Sinal", pnlSinal.x, pnlSinal.y, 15);
+  pnlSinal=new Painel("", pnlRC.x+pnlRC.w+0, pnlRC.y, 120, 85);
+//  pnlSinal=new Painel("", pnlRC.x+pnlRC.w+10, pnlRC.y, 100, 85);
+  sinal=new CheckBox("Signal gen.", pnlSinal.x, pnlSinal.y, 15);
   fSinal=new Dial(escLog, altSolta, !nInt, fmt, "f", "Hz", 50f, 125e-3f, 10e3f, pnlSinal.x+5, sinal.y+sinal.h+2, pnlSinal.w-10, 20);
   tSinal=new Dial(escLog, altSolta, !nInt, fmt, "T", "s", 20e-3f, 100e-6f, 8f, fSinal.x, fSinal.y+fSinal.h+2, fSinal.w, fSinal.h);
   tonSinal=new Dial(escLinear, altSolta, nInt, !fmt, "Ton", "%", 25f, 0f, 100f, tSinal.x, tSinal.y+tSinal.h+2, tSinal.w, tSinal.h);
 
   // posicionamento da Amostragem 
-  pnlAmostra=new Painel("Amostragem", pnlSinal.x+pnlSinal.w+10, pnlSinal.y, 200, 85);
-  dt=new Dial(escLog, altSolta, nInt, fmt, "dt", "s", 1e-3f, 10e-6f, 2f, pnlAmostra.x+5, pnlAmostra.y+20, 100, 20);
+  pnlAmostra=new Painel("Sample display setup", pnlSinal.x+pnlSinal.w+0, pnlSinal.y, 330, 85);
+//  pnlAmostra=new Painel("Amostragem", pnlSinal.x+pnlSinal.w+10, pnlSinal.y, 200, 85);
+  dt=new Dial(escLog, altSolta, nInt, fmt, "Sampling interval", "s", 1e-3f, 10e-6f, 2f, pnlAmostra.x+3, pnlAmostra.y+20, 160, 20);
+//  dt=new Dial(escLog, altSolta, nInt, fmt, "dt", "s", 1e-3f, 10e-6f, 2f, pnlAmostra.x+5, pnlAmostra.y+20, 100, 20);
   dtReal=new FmtNum(0,nInt,fmt);
-  q=new Dial(escLinear, altSolta, nInt, !fmt, "q", "", 100, 1, 100, dt.x+dt.w+5, dt.y, 60, 20);
+  q=new Dial(escLinear, altSolta, nInt, !fmt, "Samples displayed", "", 100, 1, 100, dt.x+dt.w+3, dt.y, 160, 20);
+//  q=new Dial(escLinear, altSolta, nInt, !fmt, "q", "", 100, 1, 100, dt.x+dt.w+5, dt.y, 60, 20);
   tTotal=new FmtNum(dt.v.getV()*q.v.getV(), !nInt);
   tTotalReal=new FmtNum(0,!nInt);
-  umaAmostra=new Botao("uma", dt.x, dt.y+dt.h+5, 50, 20);
-  variasAmostras=new Botao("varias", umaAmostra.x+umaAmostra.w+5, umaAmostra.y, umaAmostra.w, umaAmostra.h);
-  fluxoContinuo=new Botao("fluxo", variasAmostras.x+variasAmostras.w+5, variasAmostras.y, variasAmostras.w, variasAmostras.h);
+  umaAmostra=new Botao("Single acquisition", dt.x, dt.y+dt.h+3, 160, 20);
+  variasAmostras=new Botao("Continuous acquisition", umaAmostra.x+umaAmostra.w+3, umaAmostra.y, umaAmostra.w, umaAmostra.h);
+  // The "continuous" option yields erroneous results in the frequency measurement.  It is created, but not displayed iot not to be selected
+  fluxoContinuo=new Botao("continuous", variasAmostras.x+variasAmostras.w+5, variasAmostras.y, variasAmostras.w, variasAmostras.h);
   
 
 
@@ -193,8 +199,10 @@ void draw() {
   textSize(18); 
   text("BegOscopio "+versao, tela.x, 12);
   fill(0); 
-  textSize(12); 
-  text("rogerio.bego@hotmail.com", tela.x, tela.y-15);
+  textSize(9); 
+  text("Original s/w by rogerio.bego@hotmail.com", tela.x, tela.y-27);
+  text("Current support by Dimitrios Airantzis", tela.x, tela.y-15);
+  
   tela.display();
   // Botões de demonstração
   textSize(15);
@@ -233,7 +241,8 @@ void draw() {
   q.display();  
   umaAmostra.display();
   variasAmostras.display();
-  fluxoContinuo.display();
+  //20201122 Do not display this option as it is unreliable and causes frequency measurement errors
+//  fluxoContinuo.display();
   //== mostrar o dtReal, tTotalRea e o erro
   textAlign(LEFT);
   if (dtErro){ fill(255,0,0); } else {fill(0,20,0); }
@@ -245,9 +254,9 @@ void draw() {
   fill(0);
   //text("tTotal "+tTotalReal.printV(),pnlSinal.x+pnlSinal.w+10,pnlSinal.y+40);
   
-
-  pnlRC.display();
-  RC.display();
+// 20201122: do not display the measure RC panel as it is not needed by the students
+//  pnlRC.display();
+//  RC.display();
 
   pnlSinal.display();
   sinal.display();
@@ -590,7 +599,8 @@ void mouseClicked() {
             String fileName ="dataf"+nf(year(),4)+nf(month(),2)+nf(day(),2)+nf(hour(),2)+nf(minute(),2)+nf(second(),2)+".txt";
             output=createWriter(fileName);
             outputOpen=true;
-            save.tex="salvando";
+            save.tex="saving";
+//            save.tex="salvando";
             // cabeçalho
             //output.println("BegOscopio v"+versao+" "+nf(year())+"-"+nf(month())+"-"+nf(day())+" "+nf(hour())+":"+nf(minute())+":"+nf(second()));
             output.print("dt(");output.print(dt.v.printV());output.print(dt.unidade);output.print(")");
@@ -994,7 +1004,7 @@ void serialEvent(Serial p) {
       //println("cmd=",cmd," val=",val);
       if (cmd.equals("init")) { // init
         println("versionArduino=<",val,">");
-        com.versionArduino.tex=".ino "+val.substring(0,val.length()-1);
+        com.versionArduino.tex=" "+val.substring(0,val.length()-1);
         //start all channels
         for (int k=0;k<4;k++){
           canal[k].chN.clicado=true;
@@ -1020,8 +1030,8 @@ void serialEvent(Serial p) {
        // } else {
        //   port.write("vx");
        // }
-        println("Abri Serial");
-        println("variasAmostra.clicado=",variasAmostras.clicado);
+//        println("Abri Serial");
+//        println("variasAmostra.clicado=",variasAmostras.clicado);
         
       } else if (cmd.equals("f")) { // entra fluxo de dados - deslocar dados e armazenar no final
         String tex2[]=splitTokens(val); //val = "0(t)dtReal(t)ch0(t)ch1(t)ch2"
